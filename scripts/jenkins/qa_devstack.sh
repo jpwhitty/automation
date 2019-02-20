@@ -123,6 +123,12 @@ function h_setup_devstack {
         $zypper in 'group(nogroup)'
     fi
 
+    if ! modinfo openvswitch >/dev/null; then
+        echo "openvswitch kernel module is not available; maybe you are" \
+             "running a -base kernel?  Aborting." >&2
+        exit 1
+    fi
+
     if ! [ -e $DEVSTACK_DIR ]; then
         git clone \
             -b $DEVSTACK_BRANCH \
@@ -223,6 +229,7 @@ TEMPEST_ALLOW_TENANT_ISOLATION=True
 
 USE_PYTHON3=$USE_PYTHON3
 PYTHON3_VERSION=$PYTHON3_VERSION
+$DEVSTACK_EXTRA_CONFIG
 
 [[test-config|$$TEMPEST_CONFIG]]
 [compute]

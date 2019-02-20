@@ -2380,6 +2380,7 @@ function custom_configuration
             if [[ $want_osprofiler = 1 ]] ; then
                 if iscloudver 9M11plus ; then
                     proposal_set_value keystone default "['attributes']['keystone']['osprofiler']['enabled']" "true"
+                    proposal_set_value keystone default "['attributes']['keystone']['osprofiler']['hmac_keys']" "['SECRET']"
                     proposal_set_value keystone default "['attributes']['keystone']['osprofiler']['trace_sqlalchemy']" "true"
                 else
                     echo "Warning: osprofiler currently is only available in 9M11plus. Not enabling it"
@@ -2604,6 +2605,14 @@ function custom_configuration
                 [[ $networkingplugin = linuxbridge ]] && networkingmode=vlan
             fi
             proposal_set_value neutron default "['attributes']['neutron']['use_lbaas']" "true"
+
+            if [[ $want_l3_ha = 1 ]]; then
+                if grep -q use_l3_ha /opt/dell/chef/data_bags/crowbar/template-neutron.json ; then
+                    proposal_set_value neutron default "['attributes']['neutron']['l3_ha']['use_l3_ha']" "true"
+                else
+                    echo "Warning: l3 HA not available in this installation. Not enabling it"
+                fi
+            fi
 
             if [ $networkingplugin = openvswitch ] ; then
                 if [[ $networkingmode = vxlan ]] || iscloudver 6plus; then
